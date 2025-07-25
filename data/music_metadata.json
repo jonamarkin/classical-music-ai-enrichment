@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "music_d2f4ada3-7e75-41be-930d-c2da04c01d8a",
+    "mbid": "d2f4ada3-7e75-41be-930d-c2da04c01d8a",
+    "title": "\"Erbarme Dich\" from the Saint Matthew Passion",
+    "type": null,
+    "iswcs": [],
+    "attributes": [],
+    "language": "zxx",
+    "composer": "Johann Sebastian Bach",
+    "composer_mbid": "24f1766e-9635-4d58-a4d4-9413f9f98a4c",
+    "lyrics": null,
+    "score_url": null,
+    "audio_sample_url": null
+  },
+  {
+    "objectID": "music_0ff01b4a-081e-4840-a98a-ab0e3818d83d",
+    "mbid": "0ff01b4a-081e-4840-a98a-ab0e3818d83d",
+    "title": "\"Schmücke dich, o liebe Seele\", BWV Anh. 74",
+    "type": null,
+    "iswcs": [],
+    "attributes": [],
+    "language": "zxx",
+    "composer": "Johann Sebastian Bach",
+    "composer_mbid": "24f1766e-9635-4d58-a4d4-9413f9f98a4c",
+    "lyrics": null,
+    "score_url": null,
+    "audio_sample_url": null
+  },
+  {
+    "objectID": "music_f981c5c2-62ae-4c67-a539-f633996963b6",
+    "mbid": "f981c5c2-62ae-4c67-a539-f633996963b6",
+    "title": "\"So oft ich meine TobacksPfeife\" BWV 515b",
+    "type": null,
+    "iswcs": [],
+    "attributes": [],
+    "language": "deu",
+    "composer": "Johann Sebastian Bach",
+    "composer_mbid": "24f1766e-9635-4d58-a4d4-9413f9f98a4c",
+    "lyrics": null,
+    "score_url": null,
+    "audio_sample_url": null
+  },
+  {
+    "objectID": "music_b32602a9-b122-4188-9321-1098106e49ce",
+    "mbid": "b32602a9-b122-4188-9321-1098106e49ce",
+    "title": "“Jesus bleibet meine Freude” from Cantata, BWV 147",
+    "type": null,
+    "iswcs": [],
+    "attributes": [],
+    "language": "zxx",
+    "composer": "Johann Sebastian Bach",
+    "composer_mbid": "24f1766e-9635-4d58-a4d4-9413f9f98a4c",
+    "lyrics": null,
+    "score_url": null,
+    "audio_sample_url": null
+  },
+  {
+    "objectID": "music_7a1e78f3-0648-4550-9586-df7574bbff86",
+    "mbid": "7a1e78f3-0648-4550-9586-df7574bbff86",
+    "title": "„O Lamm Gottes, unschuldig“ (Weimarer Fassung), BWV 656a",
+    "type": null,
+    "iswcs": [],
+    "attributes": [],
+    "language": "zxx",
+    "composer": "Johann Sebastian Bach",
+    "composer_mbid": "24f1766e-9635-4d58-a4d4-9413f9f98a4c",
+    "lyrics": null,
+    "score_url": null,
+    "audio_sample_url": null
+  }
+]
