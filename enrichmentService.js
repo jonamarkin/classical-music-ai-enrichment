@@ -11,6 +11,31 @@ if (!GEMINI_API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 const MODEL_NAME = "gemini-1.5-flash";
+const EMBEDDING_MODEL_NAME = "gemini-embedding-001"; // For text embeddings
+
+async function generateTextEmbedding(text) {
+    if (!text || typeof text !== 'string' || text.trim() === '') {
+        return []; // Return an empty array for empty or invalid text
+    }
+    try {
+  
+        const response = await ai.models.embedContent({
+            model: EMBEDDING_MODEL_NAME,
+            contents: text, 
+        });
+
+        if (response && response.embeddings && response.embeddings[0] && response.embeddings[0].values) {
+            return response.embeddings[0].values;
+        }
+        console.warn(`Warning: Embedding values not found in response for text: "${text.substring(0, Math.min(text.length, 50))}..."`, response);
+        return [];
+    } catch (error) {
+        console.error(`Error generating embedding for text: "${text.substring(0, Math.min(text.length, 50))}..."`, error.message);
+        return [];
+    }
+}
+
+
 
 async function getGeminiEnrichment(work) {
     const prompt = `
@@ -73,6 +98,10 @@ async function getGeminiEnrichment(work) {
 
         const parsedResult = JSON.parse(jsonString);
 
+        const descriptionForEmbedding = parsedResult.description || `${work.title} by ${work.composer}`; // Use description, fallback to title/composer
+        const embedding = await generateTextEmbedding(descriptionForEmbedding);
+
+
         console.log(`Enrichment successful for ID: ${work.objectID}`);
         return {
             // *** THE FIX IS HERE: Add 'ai_' prefix to these keys ***
@@ -80,7 +109,8 @@ async function getGeminiEnrichment(work) {
             ai_mood: Array.isArray(parsedResult.mood) ? parsedResult.mood : (parsedResult.mood ? [parsedResult.mood] : []),
             ai_keywords: Array.isArray(parsedResult.keywords) ? parsedResult.keywords : (parsedResult.keywords ? parsedResult.keywords.split(',').map(k => k.trim()) : []),
             ai_semantic_tags: Array.isArray(parsedResult.semantic_tags) ? parsedResult.semantic_tags : (parsedResult.semantic_tags ? parsedResult.semantic_tags.split(',').map(k => k.trim()) : []),
-            ai_similar_works_description: parsedResult.similar_works_description || null
+            ai_similar_works_description: parsedResult.similar_works_description || null,
+            ai_description_embedding: embedding
         };
     } catch (error) {
         console.error(`Error enriching work '${work.title}' (ID: ${work.objectID}):`, error.message);
@@ -90,7 +120,8 @@ async function getGeminiEnrichment(work) {
             ai_mood: [],
             ai_keywords: [],
             ai_semantic_tags: [],
-            ai_similar_works_description: "AI analysis unavailable."
+            ai_similar_works_description: "AI analysis unavailable.",
+            ai_description_embedding: []
         };
     }
 }

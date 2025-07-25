@@ -1,5 +1,6 @@
-require('dotenv').config(); 
+require('dotenv').config();
 const { algoliasearch } = require('algoliasearch');
+
 const { processMusicData } = require('./enrichmentService');
 
 const ALGOLIA_APP_ID = process.env.ALGOLIA_APP_ID;
@@ -11,12 +12,36 @@ if (!ALGOLIA_APP_ID || !ALGOLIA_ADMIN_API_KEY) {
     process.exit(1);
 }
 
-// Initialize Algolia client
+// Initialize Algolia client (this should now correctly get the function)
 const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_API_KEY);
+
 
 async function indexEnrichedMusicData() {
     console.log(`Starting data enrichment and indexing to Algolia index: ${ALGOLIA_INDEX_NAME}`);
     try {
+        // --- Set Index Settings for Vector Search (v5 syntax) ---
+        console.log(`Configuring Algolia index '${ALGOLIA_INDEX_NAME}' for vector search...`);
+        await client.setSettings({ // Call setSettings directly on the client
+             indexName: ALGOLIA_INDEX_NAME, // Specify the index name
+             
+             indexSettings: { // Your settings object goes inside 'settings'
+                searchableAttributes: [
+                    'title',
+                    'composer',
+                    'type',
+                    'ai_description',
+                    'ai_mood',
+                    'ai_keywords',
+                    'ai_semantic_tags',
+                    'ai_similar_works_description',
+                    'unordered(ai_description)'
+                ],
+             }
+        });
+        console.log("Index settings updated successfully for vector search.");
+        // --- END Settings ---
+
+
         const rawMusicFilePath = './data/music_metadata.json';
         const enrichedMusic = await processMusicData(rawMusicFilePath);
 
@@ -27,12 +52,17 @@ async function indexEnrichedMusicData() {
 
         console.log(`Successfully enriched ${enrichedMusic.length} music works. Now indexing to Algolia...`);
 
+        // *** Save Objects (v5 syntax) ***
         const saveObjectsResponse = await client.saveObjects({
-            indexName: ALGOLIA_INDEX_NAME,
+            indexName: ALGOLIA_INDEX_NAME, // Specify the index name
             objects: enrichedMusic,
+            autoGenerateObjectIDIfNotExist: false
         });
 
-        const taskID = saveObjectsResponse[0].taskID; // Access taskID from the first element of the array
+        // TaskID is directly on the response object in v5
+        //const taskID = saveObjectsResponse.taskID;
+        const taskID = saveObjectsResponse[0] ? saveObjectsResponse[0].taskID : undefined;
+
 
         if (typeof taskID === 'undefined' || taskID === null) {
             console.error("Error: taskID was not returned by client.saveObjects. Check Algolia API response structure.");
@@ -41,14 +71,17 @@ async function indexEnrichedMusicData() {
         }
 
         console.log(`Indexing task ${taskID} submitted. Waiting for task to complete...`);
+        // *** Wait for Task (v5 syntax) ***
         await client.waitForTask({
-            indexName: ALGOLIA_INDEX_NAME,
+            indexName: ALGOLIA_INDEX_NAME, // Specify the index name
             taskID: taskID
         });
 
         console.log(`Successfully indexed music works to Algolia index: ${ALGOLIA_INDEX_NAME}`);
         console.log(`\nVerification: Go to your Algolia dashboard, navigate to the '${ALGOLIA_INDEX_NAME}' index, and inspect the records.`);
-        console.log("Look for 'ai_description', 'ai_mood', 'ai_keywords', 'ai_semantic_tags', and 'ai_similar_works_description' attributes.");
+        console.log("Look for 'ai_description_embedding' attribute (it will be a long array of numbers).");
+        console.log("Also verify 'ai_description', 'ai_mood', 'ai_keywords', 'ai_semantic_tags', and 'ai_similar_works_description' attributes are populated.");
+
 
     } catch (error) {
         console.error("Error during data enrichment or Algolia indexing:", error);
